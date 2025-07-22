@@ -32,14 +32,17 @@ public class ExplorecaliJpaApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		createTourAllPackages();
+		createAllTourPackages();
 		System.out.println("Persisted Packages = " + tourPackageService.total());
 		
 		createToursFromFile(TOUR_IMPORT_FILE);
 		System.out.println("Persisted Tours = " + tourService.total());
+
+		System.out.println("Varies tours: " + tourService.lookupByDifficulty(Difficulty.Varies));
+		System.out.println("Package Tours: " + tourService.lookupByPackage("BC"));
 	}
 
-	private void createTourAllPackages() {
+	private void createAllTourPackages() {
 		tourPackageService.createTourPackage("BC", "Backpack Cal");
 		tourPackageService.createTourPackage("CC", "California Calm");
 		tourPackageService.createTourPackage("CH", "California Hot springs");
