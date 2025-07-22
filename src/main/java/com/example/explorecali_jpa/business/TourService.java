@@ -31,7 +31,7 @@ public class TourService {
         Difficulty difficulty,
         Region region
     ) {
-        TourPackage tourPackage = tourPackageRepository.findById(tourPackageName)
+        TourPackage tourPackage = tourPackageRepository.findByName(tourPackageName)
             .orElseThrow(() -> new RuntimeException("Tour package not found for id" + tourPackageName));
 
         return tourRepository.save(
