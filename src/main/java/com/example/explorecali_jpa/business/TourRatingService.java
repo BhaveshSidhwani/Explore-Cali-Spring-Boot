@@ -1,0 +1,76 @@
+package com.example.explorecali_jpa.business;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.OptionalDouble;
+
+import org.springframework.stereotype.Service;
+
+import com.example.explorecali_jpa.model.Tour;
+import com.example.explorecali_jpa.model.TourRating;
+import com.example.explorecali_jpa.repo.TourRatingRepository;
+import com.example.explorecali_jpa.repo.TourRepository;
+
+@Service
+public class TourRatingService {
+    private TourRatingRepository tourRatingRepository;
+    private TourRepository tourRepository;
+
+    public TourRatingService(TourRatingRepository tourRatingRepository, TourRepository tourRepository) {
+        this.tourRatingRepository = tourRatingRepository;
+        this.tourRepository = tourRepository;
+    }
+
+    public TourRating createNew(Integer tourId, Integer customerId, Integer rating, String comment) {
+        return tourRatingRepository.save(new TourRating(verifyTour(tourId), customerId, rating, comment));
+    }
+
+    public Optional<TourRating> lookupTatingById(Integer ratingId) {
+        return tourRatingRepository.findById(ratingId);
+    }
+
+    public List<TourRating> lookupAll() {
+        return tourRatingRepository.findAll();
+    }
+
+    public List<TourRating> lookupRatings(Integer tourId) {
+        return tourRatingRepository.findByTourId(verifyTour(tourId).getId());
+    }
+
+    public TourRating update(int tourId, Integer customerId, Integer rating, String comment) throws NoSuchElementException {
+        TourRating tourRating = verifyTourRating(tourId, customerId);
+        tourRating.setRating(rating);
+        tourRating.setComment(comment);
+        return tourRatingRepository.save(tourRating);
+    }
+
+    public TourRating updateSome(int tourId, Integer customerId, Optional<Integer> rating, Optional<String> comment) throws NoSuchElementException {
+        TourRating tourRating = verifyTourRating(tourId, customerId);
+        rating.ifPresent(s -> tourRating.setRating(s));
+        comment.ifPresent(c -> tourRating.setComment(c));
+        return tourRatingRepository.save(tourRating);
+    }
+
+    public void delete(int tourId, Integer customerId) throws NoSuchElementException {
+        TourRating tourRating = verifyTourRating(tourId, customerId);
+        tourRatingRepository.delete(tourRating);
+    }
+
+    public Double getAverageRating(int tourId) throws NoSuchElementException {
+        List<TourRating> tourRatings = tourRatingRepository.findByTourId(verifyTour(tourId).getId());
+        OptionalDouble average = tourRatings.stream().mapToInt((rating) -> rating.getRating()).average();
+        return average.isPresent() ? average.getAsDouble() : null;
+    }
+
+    private Tour verifyTour(Integer tourId) {
+        return tourRepository.findById(tourId)
+            .orElseThrow(() -> new NoSuchElementException("Tour does not exist for tourId: " + tourId));
+    }
+
+    private TourRating verifyTourRating(int tourId, int customerId) throws NoSuchElementException {
+        return tourRatingRepository.findByTourIdAndCustomerId(tourId, customerId)
+            .orElseThrow(() -> new NoSuchElementException("Tour-Rating pair for request("
+                + tourId + " for customer" + customerId));
+    }
+}
