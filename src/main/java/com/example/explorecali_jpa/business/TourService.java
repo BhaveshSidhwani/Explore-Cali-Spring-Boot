@@ -12,8 +12,10 @@ import com.example.explorecali_jpa.repo.TourPackageRepository;
 import com.example.explorecali_jpa.repo.TourRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @Transactional
 public class TourService {
     private TourPackageRepository tourPackageRepository;
@@ -36,6 +38,7 @@ public class TourService {
         Difficulty difficulty,
         Region region
     ) {
+        log.info("create tour {} for package {}", title, tourPackageName);
         TourPackage tourPackage = tourPackageRepository.findByName(tourPackageName)
             .orElseThrow(() -> new RuntimeException("Tour package not found for id" + tourPackageName));
 
@@ -49,14 +52,17 @@ public class TourService {
     }
 
     public List<Tour> lookupByDifficulty(Difficulty difficulty) {
+        log.info("lookup tours by difficulty {}", difficulty);
         return tourRepository.findAllByDifficulty(difficulty);
     }
 
     public List<Tour> lookupByPackage(String tourPackageCode) {
+        log.info("lookup tour by code {}", tourPackageCode);
         return tourRepository.findAllByTourPackageCode(tourPackageCode);
     }
 
     public long total() {
+        log.info("get tour count");
         return tourRepository.count();
     }
 }

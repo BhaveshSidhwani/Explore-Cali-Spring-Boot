@@ -12,13 +12,16 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public final ResponseEntity<Object> handleResourceNotFoundException(
         ResourceNotFoundException ex, WebRequest request) {
 
+        logException(ex);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         return createResponseEntity(pd, null, HttpStatus.NOT_FOUND, request);
     }
@@ -27,6 +30,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<Object> handleNoSuchElementException(
         NoSuchElementException ex, WebRequest request) {
 
+        logException(ex);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
         return createResponseEntity(pd, null, HttpStatus.NOT_FOUND, request);
     }
@@ -35,13 +39,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<Object> handleConstraintViolationException(
         ConstraintViolationException ex, WebRequest request) {
 
+        logException(ex);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
         return  createResponseEntity(pd, null, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<Object> handleGeneralException(Exception ex, WebRequest request) {
+        logException(ex);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         return createResponseEntity(pd, null, HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+
+    private void logException(Exception ex) {
+        log.error("Caught Exception", ex);
     }
 }

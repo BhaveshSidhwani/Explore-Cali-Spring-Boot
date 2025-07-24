@@ -17,6 +17,8 @@ import com.example.explorecali_jpa.business.TourRatingService;
 import com.example.explorecali_jpa.model.TourRating;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 
 @RestController
+@Slf4j
 @RequestMapping(path = "/tours/{tourId}/ratings")
 public class TourRatingController {
     private TourRatingService tourRatingService;
@@ -34,12 +37,14 @@ public class TourRatingController {
 
     @GetMapping
     public List<RatingDto> getAllRatingsForTour(@PathVariable Integer tourId) {
+        log.info("GET /tours/{}/ratings", tourId);
         List<TourRating> tourRatings = tourRatingService.lookupRatings(tourId);
         return tourRatings.stream().map(RatingDto::new).toList();
     }
 
     @GetMapping("/average")
     public Map<String, Double> getAverage(@PathVariable Integer tourId) {
+        log.info("GET /tours/{}/ratings/average", tourId);
         return Map.of("average", tourRatingService.getAverageRating(tourId));
     }
 
@@ -49,13 +54,14 @@ public class TourRatingController {
         @PathVariable Integer tourId,
         @RequestBody @Valid RatingDto ratingDto
     ) {
-        System.out.println("ratingDto: " + ratingDto);
+        log.info("POST /tours/{}/ratings", tourId);
         tourRatingService.createNew(tourId, ratingDto.getCustomerId(), ratingDto.getRating(), ratingDto.getComment());
     }
 
     @PostMapping("/batch")
     @ResponseStatus(HttpStatus.CREATED)
     public void createManyTourRatings(@PathVariable int tourId, @RequestParam int rating, @RequestBody List<Integer> customers) {
+        log.info("POST /tours/{}/ratings/batch", tourId);
         tourRatingService.rateMany(tourId, rating, customers);
     }
 
@@ -64,6 +70,7 @@ public class TourRatingController {
         @PathVariable Integer tourId,
         @RequestBody @Valid RatingDto rating
     ) {
+        log.info("PUT /tours/{}/ratings", tourId);
         return new RatingDto(tourRatingService.update(tourId, rating.getCustomerId(), rating.getRating(), rating.getComment()));
     }
 
@@ -72,6 +79,7 @@ public class TourRatingController {
         @PathVariable Integer tourId,
         @RequestBody @Valid RatingDto rating
     ) {
+        log.info("PATCH /tours/{}/ratings", tourId);
         return new RatingDto(
             tourRatingService.updateSome(
                 tourId,
@@ -87,6 +95,7 @@ public class TourRatingController {
         @PathVariable Integer tourId,
         @PathVariable Integer customerId
     ) {
+        log.info("DELETE /tours/{}/ratings", tourId);
         tourRatingService.delete(tourId, customerId);
     }
 }
