@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 import com.example.explorecali_jpa.model.TourPackage;
 import com.example.explorecali_jpa.repo.TourPackageRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class TourPackageService {
     private TourPackageRepository tourPackageRepository;
 

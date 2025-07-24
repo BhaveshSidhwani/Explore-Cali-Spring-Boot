@@ -12,7 +12,11 @@ import com.example.explorecali_jpa.model.TourRating;
 import com.example.explorecali_jpa.repo.TourRatingRepository;
 import com.example.explorecali_jpa.repo.TourRepository;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+
 @Service
+@Transactional
 public class TourRatingService {
     private TourRatingRepository tourRatingRepository;
     private TourRepository tourRepository;
@@ -61,6 +65,16 @@ public class TourRatingService {
         List<TourRating> tourRatings = tourRatingRepository.findByTourId(verifyTour(tourId).getId());
         OptionalDouble average = tourRatings.stream().mapToInt((rating) -> rating.getRating()).average();
         return average.isPresent() ? average.getAsDouble() : null;
+    }
+
+    public void rateMany(int tourId,  int rating, List<Integer> customers) {
+        Tour tour = verifyTour(tourId);
+        for (Integer c : customers) {
+        if (tourRatingRepository.findByTourIdAndCustomerId(tourId, c).isPresent()) {
+            throw new ConstraintViolationException("Unable to create duplicate ratings", null);
+        }
+        tourRatingRepository.save(new TourRating(tour, c, rating));
+        }
     }
 
     private Tour verifyTour(Integer tourId) {

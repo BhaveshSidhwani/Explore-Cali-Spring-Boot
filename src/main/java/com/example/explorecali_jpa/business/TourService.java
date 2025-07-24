@@ -11,7 +11,10 @@ import com.example.explorecali_jpa.model.TourPackage;
 import com.example.explorecali_jpa.repo.TourPackageRepository;
 import com.example.explorecali_jpa.repo.TourRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class TourService {
     private TourPackageRepository tourPackageRepository;
     private TourRepository tourRepository;
