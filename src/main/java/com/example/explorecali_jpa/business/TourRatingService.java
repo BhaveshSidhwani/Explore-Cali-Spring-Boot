@@ -33,7 +33,7 @@ public class TourRatingService {
         return tourRatingRepository.save(new TourRating(verifyTour(tourId), customerId, rating, comment));
     }
 
-    public Optional<TourRating> lookupTatingById(Integer ratingId) {
+    public Optional<TourRating> lookupRatingById(Integer ratingId) {
         log.info("lookup rating by id {}", ratingId);
         return tourRatingRepository.findById(ratingId);
     }
